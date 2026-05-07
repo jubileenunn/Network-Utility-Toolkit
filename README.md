@@ -4,7 +4,7 @@ A lightweight, extensible Python CLI toolkit for everyday network diagnostics an
 
 This project bundles several essential tools into one clean interface:
 
-- Ping sweep (' CIDR ')
+- Ping sweep (CIDR)
 - Port scanner
 - DNS lookup
 - Traceroute
