@@ -17,13 +17,13 @@ Includes:
 
 ##  Features
 
-###  Ping Sweep  
+##  Ping Sweep  
 Scan an entire subnet and identify live hosts.
 
-###  Port Scanner  
+##  Port Scanner  
 Fast multi-threaded TCP port scanning.
 
-###  DNS Lookup  
+##  DNS Lookup  
 Resolve A, AAAA, MX, TXT, and other DNS records.
 
 ###  Traceroute  
