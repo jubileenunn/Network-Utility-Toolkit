@@ -8,11 +8,11 @@ This project bundles several essential tools into one clean interface:
 - Port scanner
 - DNS lookup
 - Traceroute
-- JSON output mode (--json)
+- JSON output mode (-- json)
 - Colored terminal output (via Rich)
 - Progress bars
-- Verbose mode (`-v`)
-- Quiet mode (`-q`)
+- Verbose mode (-v)
+- Quiet mode (-q)
 
 ---
 
