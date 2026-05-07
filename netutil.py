@@ -2,9 +2,18 @@
 """
 Network Utility Toolkit (single file)
 
+This toolkit bundles several essential network diagnostic tools into one
+clean, easy-to-use command-line interface.
+
+Included tools:
+- Ping sweep (CIDR)
+- Port scanner
+- DNS lookup
+- Traceroute
+
 Enhancements:
 - JSON output mode
-- Colored terminal output
+- Colored terminal output (Rich)
 - Progress bars
 - Verbose mode
 - Quiet mode
@@ -18,7 +27,6 @@ import socket
 import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# Rich for colors + progress bars
 from rich import print
 from rich.progress import Progress
 
@@ -34,13 +42,15 @@ except ImportError:
 # Ping Sweep
 # ------------------------------------------------------------
 
-def _ping_host(host: str, timeout: int = 1000, verbose=False) -> bool:
+def _ping_host(host: str, timeout: int = 1000, verbose: bool = False) -> bool:
+    """Send a single ping to a host and return True if it responds."""
     system = platform.system().lower()
 
-    if system == "windows":
-        cmd = ["ping", "-n", "1", "-w", str(timeout), host]
-    else:
-        cmd = ["ping", "-c", "1", "-W", str(max(1, timeout // 1000)), host]
+    cmd = (
+        ["ping", "-n", "1", "-w", str(timeout), host]
+        if system == "windows"
+        else ["ping", "-c", "1", "-W", str(max(1, timeout // 1000)), host]
+    )
 
     if verbose:
         print(f"[cyan]Pinging {host}[/cyan]")
@@ -50,7 +60,7 @@ def _ping_host(host: str, timeout: int = 1000, verbose=False) -> bool:
             cmd,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
-            check=False
+            check=False,
         )
         return result.returncode == 0
     except Exception:
@@ -58,9 +68,10 @@ def _ping_host(host: str, timeout: int = 1000, verbose=False) -> bool:
 
 
 def ping_sweep(cidr: str, max_workers: int = 100, verbose=False, quiet=False):
+    """Ping every host in a CIDR block and return a list of responsive IPs."""
     network = ipaddress.ip_network(cidr, strict=False)
     hosts = [str(h) for h in network.hosts()]
-    alive = []
+    alive_hosts = []
 
     with Progress() as progress:
         task = progress.add_task("[green]Scanning hosts...", total=len(hosts))
@@ -71,12 +82,12 @@ def ping_sweep(cidr: str, max_workers: int = 100, verbose=False, quiet=False):
             for future in as_completed(futures):
                 host = futures[future]
                 if future.result():
-                    alive.append(host)
+                    alive_hosts.append(host)
                     if not quiet:
                         print(f"[green]+[/green] {host}")
                 progress.update(task, advance=1)
 
-    return alive
+    return alive_hosts
 
 
 # ------------------------------------------------------------
@@ -84,6 +95,7 @@ def ping_sweep(cidr: str, max_workers: int = 100, verbose=False, quiet=False):
 # ------------------------------------------------------------
 
 def _scan_port(host: str, port: int, timeout: float = 1.0, verbose=False) -> bool:
+    """Attempt to connect to a TCP port; return True if open."""
     if verbose:
         print(f"[cyan]Checking port {port}[/cyan]")
 
@@ -97,6 +109,7 @@ def _scan_port(host: str, port: int, timeout: float = 1.0, verbose=False) -> boo
 
 
 def port_scan(host: str, ports: range, max_workers: int = 200, verbose=False, quiet=False):
+    """Scan a range of ports on a host and return a sorted list of open ports."""
     open_ports = []
 
     with Progress() as progress:
@@ -121,6 +134,7 @@ def port_scan(host: str, ports: range, max_workers: int = 200, verbose=False, qu
 # ------------------------------------------------------------
 
 def dns_lookup(hostname: str, record_type: str = "A"):
+    """Perform a DNS lookup for a given record type."""
     if not HAS_DNSPYTHON:
         raise RuntimeError("dnspython is required (pip install dnspython)")
 
@@ -134,112 +148,13 @@ def dns_lookup(hostname: str, record_type: str = "A"):
 # ------------------------------------------------------------
 
 def traceroute(target: str, max_hops: int = 30):
+    """Run system traceroute/tracert and return the raw output."""
     system = platform.system().lower()
 
-    if system == "windows":
-        cmd = ["tracert", "-h", str(max_hops), target]
-    else:
-        cmd = ["traceroute", "-m", str(max_hops), target]
-
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            check=False
-        )
-        return result.stdout
-    except FileNotFoundError:
-        return "Error: traceroute command not found."
-
-
-# ------------------------------------------------------------
-# Helpers
-# ------------------------------------------------------------
-
-def _parse_ports(spec: str):
-    ports = set()
-
-    for part in spec.split(","):
-        part = part.strip()
-        if not part:
-            continue
-
-        if "-" in part:
-            try:
-                start, end = part.split("-", 1)
-                ports.update(range(int(start), int(end) + 1))
-            except ValueError:
-                continue
-        else:
-            try:
-                ports.add(int(part))
-            except ValueError:
-                continue
-
-    if not ports:
-        return range(0)
-
-    return range(min(ports), max(ports) + 1)
-
-
-# ------------------------------------------------------------
-# Main CLI
-# ------------------------------------------------------------
-
-def main():
-    parser = argparse.ArgumentParser(
-        prog="netutil",
-        description="Network Utility Toolkit"
+    cmd = (
+        ["tracert", "-h", str(max_hops), target]
+        if system == "windows"
+        else ["traceroute", "-m", str(max_hops), target]
     )
 
-    parser.add_argument("--json", action="store_true", help="Output results as JSON")
-    parser.add_argument("-v", "--verbose", action="store_true", help="Verbose mode")
-    parser.add_argument("-q", "--quiet", action="store_true", help="Quiet mode")
-
-    subparsers = parser.add_subparsers(dest="command", required=True)
-
-    ps = subparsers.add_parser("ping-sweep")
-    ps.add_argument("cidr")
-
-    pscan = subparsers.add_parser("port-scan")
-    pscan.add_argument("host")
-    pscan.add_argument("--ports", default="1-1024")
-
-    dns_p = subparsers.add_parser("dns")
-    dns_p.add_argument("hostname")
-    dns_p.add_argument("-t", "--type", default="A")
-
-    tr = subparsers.add_parser("traceroute")
-    tr.add_argument("target")
-    tr.add_argument("--max-hops", type=int, default=30)
-
-    args = parser.parse_args()
-
-    # Routing
-    if args.command == "ping-sweep":
-        result = ping_sweep(args.cidr, verbose=args.verbose, quiet=args.quiet)
-
-    elif args.command == "port-scan":
-        ports = _parse_ports(args.ports)
-        result = port_scan(args.host, ports, verbose=args.verbose, quiet=args.quiet)
-
-    elif args.command == "dns":
-        result = dns_lookup(args.hostname, args.type)
-
-    elif args.command == "traceroute":
-        result = traceroute(args.target, args.max_hops)
-
-    # JSON output
-    if args.json:
-        print(json.dumps({"result": result}, indent=2))
-    else:
-        if isinstance(result, list):
-            for item in result:
-                print(item)
-        else:
-            print(result)
-
-
-if __name__ == "__main__":
-    main()
+    try:
