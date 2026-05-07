@@ -15,36 +15,36 @@ Includes:
 
 ---
 
-##  Features
+#  Features
 
-##  Ping Sweep  
+#  Ping Sweep  
 Scan an entire subnet and identify live hosts.
 
-##  Port Scanner  
+#  Port Scanner  
 Fast multi-threaded TCP port scanning.
 
-##  DNS Lookup  
+#  DNS Lookup  
 Resolve A, AAAA, MX, TXT, and other DNS records.
 
-###  Traceroute  
+#  Traceroute  
 Trace the network path to a target host.
 
-###  JSON Output Mode  
+#  JSON Output Mode  
 Machine‑readable output for automation and scripting.
 
-###  Colored Output  
+#  Colored Output  
 Readable, color‑coded results using the `rich` library.
 
-###  Progress Bars  
+#  Progress Bars  
 Live progress indicators for long-running scans.
 
-###  Verbose & Quiet Modes  
+#  Verbose & Quiet Modes  
 - `-v` shows detailed actions  
 - `-q` suppresses non-essential output  
 
 ---
 
-## 📦 Installation
+# 📦 Installation
 
 ```bash
 git clone https://github.com/jubileenunn/Network-Utility-Toolkit.git
