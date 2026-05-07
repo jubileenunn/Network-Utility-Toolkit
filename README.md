@@ -1,8 +1,9 @@
 # Network Utility Toolkit
 
-A lightweight, extensible Python CLI toolkit for common network diagnostic tasks.
+A lightweight, extensible Python CLI toolkit for everyday network diagnostics and exploration.
 
-Includes:
+This project bundles several essential tools into one clean interface:
+
 - Ping sweep (CIDR)
 - Port scanner
 - DNS lookup
@@ -15,36 +16,36 @@ Includes:
 
 ---
 
-#  Features
+## ✨ Features
 
-#  Ping Sweep  
-Scan an entire subnet and identify live hosts.
+### Ping Sweep  
+Scan an entire subnet and quickly identify which hosts are alive.
 
-#  Port Scanner  
-Fast multi-threaded TCP port scanning.
+### Port Scanner  
+Fast, multi-threaded TCP port scanning with clean, readable output.
 
-#  DNS Lookup  
-Resolve A, AAAA, MX, TXT, and other DNS records.
+### DNS Lookup  
+Resolve A, AAAA, MX, TXT, and other DNS record types.
 
-#  Traceroute  
-Trace the network path to a target host.
+### Traceroute  
+Trace the network path to a target host and inspect each hop.
 
-#  JSON Output Mode  
-Machine‑readable output for automation and scripting.
+### JSON Output Mode  
+Perfect for automation, scripting, or piping results into other tools.
 
-#  Colored Output  
-Readable, color‑coded results using the `rich` library.
+### Colored Output  
+Rich-powered color formatting for clarity and readability.
 
-#  Progress Bars  
+### Progress Bars  
 Live progress indicators for long-running scans.
 
-#  Verbose & Quiet Modes  
+### Verbose & Quiet Modes  
 - `-v` shows detailed actions  
 - `-q` suppresses non-essential output  
 
 ---
 
-# 📦 Installation
+## 📦 Installation
 
 ```bash
 git clone https://github.com/jubileenunn/Network-Utility-Toolkit.git
