@@ -16,7 +16,7 @@ This project bundles several essential tools into one clean interface:
 
 ---
 
-## ✨ Features
+##  Features
 
 ### Ping Sweep  
 Scan an entire subnet and quickly identify which hosts are alive.
